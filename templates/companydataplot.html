@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Alluvial Chart Company</title>
+
+    <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-sankey.min.js"></script>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+
+      form {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      label {
+        margin-right: 10px;
+        font-weight: bold;
+      }
+
+      input[type="text"] {
+        padding: 8px;
+        width: 200px;
+      }
+
+      button {
+        padding: 8px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      canvas#alluvialChart {
+        width: 100%;
+        height: 500px;
+      }
+
+      table {
+        margin: 20px auto;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      #container {
+        margin-top: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        width: 100%;
+        max-width: 800px;
+        height: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Chart Company Data + Alluvial plots</h1>
+
+    <!-- Search Form -->
+    <form method="POST" action="/companydataplot/result">
+      <label for="alluvialcompany">Search for Company: </label>
+      <input type="text" id="alluvialcompany" name="alluvialcompany" />
+      <button type="submit">Submit</button>
+    </form>
+
+    <!-- Search Results Table -->
+    <div>
+      <h2>Search Results</h2>
+      <table border="1">
+        <thead>
+          <tr>
+            <th>To</th>
+            <th>Value</th>
+            <th>From</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for index in range((query_data|length) ) %}
+          <tr>
+            <td>{{ query_data[index][0] }}</td>
+            <td>{{ query_data[index][1] }}</td>
+            <td>{{ query_data[index][2] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div id="container"></div>
+
+    {% if chart_data %}
+    <script>
+      anychart.onDocumentReady(function () {
+          // Add data
+          const data = {{ chart_data | safe }};
+
+
+          let chart = anychart.sankey();
+
+
+          chart.data(data);
+
+
+          chart.padding(40,40,40,40);
+
+
+          chart.title("Alluvial Chart Company");
+
+
+          chart.container("container");
+
+
+          chart.draw();
+      });
+    </script>
+    {% endif %}
+  </body>
+</html>

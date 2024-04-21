@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Search</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1,
+      h2 {
+        text-align: center;
+      }
+
+      form {
+        margin-bottom: 20px;
+      }
+
+      label {
+        font-weight: bold;
+      }
+
+      select,
+      input[type="text"],
+      button {
+        margin: 5px;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        width: 200px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      .no-data {
+        text-align: center;
+        margin-top: 20px;
+        color: #999;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="back-btn">
+      <button onclick="window.location.href = '/';">
+        Go Back to Main Page
+      </button>
+      <h1>Search</h1>
+      <form method="POST" action="/find/result">
+        <label for="search_table">Select Table:</label>
+        <select id="search_table" name="search_table">
+          <option value="">Select Table</option>
+          <option value="redemption">Redemption</option>
+          <option value="purchased">Purchase</option>
+        </select>
+
+        <label for="search_column">Search by Column:</label>
+        <select id="search_column" name="search_column" disabled></select>
+
+        <input type="text" id="search_term" name="search_term" />
+        <button type="submit">Search</button>
+      </form>
+
+      <hr />
+
+      {% if search_results %}
+      <h2>Search Results</h2>
+      <table border="1">
+        <tr>
+          <th>Sr No</th>
+          {% for header in column_headers %}
+          <th>{{ header }}</th>
+          {% endfor %}
+        </tr>
+        {% for result in search_results %}
+        <tr>
+          {% for value in result %}
+          <td>{{ value }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </table>
+      {% else %}
+      <div class="no-data">No data found</div>
+      {% endif %}
+
+      <script>
+        document
+          .getElementById("search_table")
+          .addEventListener("change", function () {
+            var table = this.value;
+            console.log(table);
+            var selectColumn = document.getElementById("search_column");
+            selectColumn.innerHTML = "";
+
+            if (table) {
+              selectColumn.disabled = false;
+              var columns = {};
+              columns["redemption"] = [
+                "Date_of_Encashment",
+                "Name_of_party",
+                "Account_no",
+                "prefix",
+                "bond_number",
+                "denominations",
+                "pay_branch_code",
+                "pay_teller",
+              ];
+              columns["purchased"] = [
+                "ref_no",
+                "journal_date",
+                "date_of_purchase",
+                "date_of_expiry",
+                "name_of_purchaser",
+                "prefix",
+                "bond_number",
+                "denominations",
+                "issue_code_branch",
+                "issue_teller",
+                "status",
+              ];
+
+              columns[table].forEach(function (column) {
+                var option = document.createElement("option");
+                option.text = column;
+                option.value = column.replace(/\s+/g, "");
+                selectColumn.appendChild(option);
+              });
+            } else {
+              selectColumn.disabled = true;
+            }
+          });
+      </script>
+    </div>
+  </body>
+</html>

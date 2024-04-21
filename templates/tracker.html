@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bonds Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+
+      h1 {
+        text-align: center;
+        margin-top: 20px;
+        color: #333;
+      }
+
+      h2 {
+        text-align: center;
+        color: #333;
+      }
+
+      form {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      form input[type="text"] {
+        padding: 8px;
+        width: 200px;
+      }
+
+      form button {
+        padding: 8px 20px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      form button:hover {
+        background-color: #45a049;
+      }
+
+      table {
+        margin: 0 auto;
+        background-color: #fff;
+        border-collapse: collapse;
+        width: 80%;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      .button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      button {
+        padding: 10px 20px;
+        background-color: #008cba;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #005f6b;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Bonds Tracker</h1>
+
+    <form method="POST" action="/tracker/result">
+      <label for="political_party">Political Party:</label>
+      <input type="text" id="political_party" name="political_party" />
+      <button type="submit">Submit</button>
+    </form>
+
+    <div>
+      <canvas id="bondsChart"></canvas>
+    </div>
+
+    <div>
+      <canvas id="totalValueChart"></canvas>
+    </div>
+
+    <div>
+      <h2>Search Results</h2>
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>Number of Bonds</th>
+            <th>Total Bond Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for index in range(years|length) %}
+          <tr>
+            <td>{{ years[index] }}</td>
+            <td>{{ num_bonds[index] }}</td>
+            <td>{{ total_value[index] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="button-container">
+      <button id="saveBondsChartButton">Save Bonds Chart</button>
+      <button id="saveTotalValueChartButton">Save Value Chart</button>
+    </div>
+
+    <script>
+      {% if years %}
+      const years = {{ years|tojson }};
+      const num_bonds = {{ num_bonds|tojson }};
+      const total_value = {{ total_value|tojson}};
+
+      var bondsChart = new Chart(document.getElementById('bondsChart'), {
+        type: 'bar',
+        data: {
+          labels: years,
+          datasets: [{
+            label: 'Number of Bonds',
+            backgroundColor: 'blue',
+            data: num_bonds
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+
+      var totalValueChart = new Chart(document.getElementById('totalValueChart'), {
+        type: 'bar',
+        data: {
+          labels: years,
+          datasets: [{
+            label: 'Total Bond Value',
+            backgroundColor: 'green',
+            data: total_value
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+
+      document.getElementById('saveBondsChartButton').addEventListener('click', function() {
+        var url_base64jp = bondsChart.toBase64Image();
+        var a = document.createElement('a');
+        a.href = url_base64jp;
+        a.download = 'bondsChart.png';
+        a.click();
+      });
+
+      document.getElementById('saveTotalValueChartButton').addEventListener('click', function() {
+        var url_base64jp = totalValueChart.toBase64Image();
+        var a = document.createElement('a');
+        a.href = url_base64jp;
+        a.download = 'totalValueChart.png';
+        a.click();
+      });
+      {% endif %}
+    </script>
+  </body>
+</html>
